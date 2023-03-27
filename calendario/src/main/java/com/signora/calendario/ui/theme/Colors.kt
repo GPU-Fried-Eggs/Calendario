@@ -76,9 +76,9 @@ fun lightColors(
     onBackgroundColor: Color = Color.Black,
     defaultItemBackgroundColor: Color = Color.White,
     selectedItemBackgroundColor: Color = Color(0xFFE7E6E6),
-    onSelectedItemBackgroundColor: Color = Color(0xFFF),
+    onSelectedItemBackgroundColor: Color = Color.Black,
     todayItemBackgroundColor: Color = Color(0xFF0067BF),
-    onTodayItemBackgroundColor: Color = Color(0xFFF)
+    onTodayItemBackgroundColor: Color = Color.Black
 ): Colors = Colors(
     backgroundColor,
     onBackgroundColor,
@@ -95,9 +95,9 @@ fun darkColors(
     onBackgroundColor: Color = Color.White,
     defaultItemBackgroundColor: Color = Color(0xFF121212),
     selectedItemBackgroundColor: Color = Color(0x943E3E3E),
-    onSelectedItemBackgroundColor: Color = Color(0xFFF),
+    onSelectedItemBackgroundColor: Color = Color.White,
     todayItemBackgroundColor: Color = Color(0xFF4CC1FE),
-    onTodayItemBackgroundColor: Color = Color(0xFFF)
+    onTodayItemBackgroundColor: Color = Color.White
 ): Colors = Colors(
     backgroundColor,
     onBackgroundColor,
