@@ -57,7 +57,7 @@ fun CalendarHeader(
         IconToggleButton(
             checked = expanded,
             onCheckedChange = { checked ->
-                onStateChange.run { if (checked) ExpandCalendar else CollapseCalendar }
+                onStateChange(if (checked) ExpandCalendar else CollapseCalendar)
             }
         ) {
             Icon(

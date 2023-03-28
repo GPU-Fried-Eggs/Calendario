@@ -24,6 +24,14 @@ class LocalDateTest {
     }
 
     @Test
+    fun `when getWeekEndDate is called, should get the end date of a week by current date`() {
+        assertEquals(
+            LocalDate.of(2023, 1, 1),
+            LocalDate.of(2023, 1, 1).getWeekEndDate()
+        )
+    }
+
+    @Test
     fun `when getRemainingDatesInWeek is called, should get the date collection of a week by current date`() {
         assertArrayEquals(
             Array(5) {
@@ -34,10 +42,29 @@ class LocalDateTest {
     }
 
     @Test
-    fun `when getMonthStartDate is called, should get the beginning date of a month base on Monday by current date`() {
+    fun `when getWeekRange is called, should get a pair of start day and end day`() {
         assertEquals(
-            LocalDate.of(2022, 12, 26),
-            LocalDate.of(2023, 1, 1).getWeekStartDate()
+            Pair(
+                LocalDate.of(2022, 12, 26),
+                LocalDate.of(2023, 1, 1)
+            ),
+            LocalDate.of(2023, 1, 1).getWeekRange()
+        )
+    }
+
+    @Test
+    fun `when getMonthStartDate is called, should get the beginning date of a month by current date`() {
+        assertEquals(
+            LocalDate.of(2023, 1, 1),
+            LocalDate.of(2023, 1, 1).getMonthStartDate()
+        )
+    }
+
+    @Test
+    fun `when getMonthEndDate is called, should get the end date of a month by current date`() {
+        assertEquals(
+            LocalDate.of(2023, 1, 31),
+            LocalDate.of(2023, 1, 1).getMonthEndDate()
         )
     }
 

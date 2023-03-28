@@ -1,12 +1,14 @@
 package com.signora.calendario.utils
 
 import java.time.LocalDate
+import java.time.YearMonth
+import kotlin.math.abs
 
-internal fun calculateMonthTable(startDate: LocalDate, offset: Int = 0): List<LocalDate> {
-    val monthFirstDate = startDate.run {
+internal fun calculateMonthTable(yearMonth: YearMonth, offset: Int = 0): List<LocalDate> {
+    val monthFirstDate = yearMonth.atDay(1).run {
         when {
-            offset > 0 -> minusMonths(1)
-            offset < 0 -> plusMonths(1)
+            offset > 0 -> plusMonths(offset.toLong())
+            offset < 0 -> minusMonths(abs(offset).toLong())
             else -> this
         }
     }
