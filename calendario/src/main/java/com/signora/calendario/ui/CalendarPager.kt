@@ -43,7 +43,12 @@ fun CalendarPager(
         }
     }
 
-    Pager(pageCount, pagerState, orientation, pageContent);
+    Pager(
+        pageCount = pageCount,
+        pageState = pagerState,
+        orientation = orientation,
+        pageContent = pageContent
+    );
 }
 
 @Preview

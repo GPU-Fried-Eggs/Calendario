@@ -5,12 +5,9 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.setValue
 
 @Stable
 class PagerState(initialPage: Int = 0) : ScrollableState {
@@ -20,15 +17,19 @@ class PagerState(initialPage: Int = 0) : ScrollableState {
 
     var currentPage by mutableStateOf(initialPage)
 
+    val pageCount: Int by derivedStateOf { lazyListState.layoutInfo.totalItemsCount }
+
     val currentLayoutPageInfo: LazyListItemInfo?
         get() = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull { it.offset <= 0 }
 
     suspend fun scrollToPage(page: Int, pageOffset: Float = 0f) {
         try {
-            animationTargetPage = page
+            val targetPage = page.coerceInPageRange()
+
+            animationTargetPage = targetPage
 
             // First scroll to the given page. It will now be laid out at offset 0
-            lazyListState.scrollToItem(index = page)
+            lazyListState.scrollToItem(index = targetPage)
 
             // If we have a start spacing, we need to offset (scroll) by that too
             if (pageOffset > 0.0001f) {
@@ -42,6 +43,8 @@ class PagerState(initialPage: Int = 0) : ScrollableState {
             onScrollFinished()
         }
     }
+
+    private fun Int.coerceInPageRange() = if (pageCount > 0) { coerceIn(0, pageCount - 1) } else { 0 }
 
     internal fun updateCurrentPageBasedOnLazyListState() {
         currentLayoutPageInfo?.let{ currentPage = it.index }
