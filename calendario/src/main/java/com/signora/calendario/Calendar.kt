@@ -2,6 +2,7 @@ package com.signora.calendario
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -83,14 +84,44 @@ fun ExpandableCalendar(
     )
 }
 
+@Composable
+fun TaskBoardCalendar(
+    colors: Colors = if (isSystemInDarkTheme()) darkColors() else lightColors(),
+    shapes: Shapes = CalendarioTheme.shapes,
+    onDateSelect: (LocalDate) -> Unit = {},
+    headerContent: @Composable (CalendarViewModel) -> Unit = { viewModel ->
+        CalendarHeader(
+            currentMonth = viewModel.displayMonth,
+            expanded = viewModel.expanded,
+            onStateChange = { viewModel.onIntent(it) }
+        )
+    },
+    footerContent: @Composable (CalendarViewModel) -> Unit = {
+    }
+) {
+    CalenderTheme(colors, shapes) {
+        Calendar(
+            onDateSelect = onDateSelect,
+            headerContent = headerContent,
+            footerContent = footerContent
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun CalendarPreview() {
-    Calendar()
+    TaskBoardCalendar()
 }
 
 @Preview
 @Composable
 private fun ExpandableCalendarPreview() {
     ExpandableCalendar()
+}
+
+@Preview
+@Composable
+private fun TaskBoardCalendarPreview() {
+    TaskBoardCalendar()
 }
