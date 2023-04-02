@@ -33,19 +33,17 @@ fun CalendarPager(
     val pagerState = rememberSaveable(saver = PagerState.Saver) { PagerState(1) }
 
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage == 0) {
-            loadPrevDates(loadedMonthWeek[0])
-            pagerState.scrollToPage(1)
-        }
-        if (pagerState.currentPage == 2) {
-            loadNextDates(loadedMonthWeek[2])
-            pagerState.scrollToPage(1)
-        }
+        if (pagerState.currentPage == 0) loadPrevDates(loadedMonthWeek[0])
+        if (pagerState.currentPage == 2) loadNextDates(loadedMonthWeek[2])
+    }
+
+    LaunchedEffect(loadedMonthWeek) {
+        pagerState.scrollToPage(1)
     }
 
     Pager(
         pageCount = pageCount,
-        pageState = pagerState,
+        state = pagerState,
         orientation = orientation,
         pageContent = pageContent
     );

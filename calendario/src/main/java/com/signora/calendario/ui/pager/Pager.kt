@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.filter
 fun Pager(
     modifier: Modifier = Modifier,
     pageCount: Int = 3,
-    pageState: PagerState,
+    state: PagerState,
     pageSpacing: Dp = 0.dp,
     orientation: Orientation = Orientation.Horizontal,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
@@ -45,19 +45,19 @@ fun Pager(
     val consumeFlingNestedScrollConnection = remember(orientation) { ConsumeFlingNestedScrollConnection(orientation) }
 
     LaunchedEffect(pageCount) {
-        pageState.currentPage = minOf(pageCount - 1, pageState.currentPage).coerceAtLeast(0)
+        state.currentPage = minOf(pageCount - 1, state.currentPage).coerceAtLeast(0)
     }
 
-    LaunchedEffect(pageState) {
-        snapshotFlow { pageState.isScrollInProgress }
+    LaunchedEffect(state) {
+        snapshotFlow { state.isScrollInProgress }
             .filter { !it }.drop(1)
-            .collect { pageState.onScrollFinished() }
+            .collect { state.onScrollFinished() }
     }
 
-    LaunchedEffect(pageState) {
-        snapshotFlow { pageState.currentLayoutPageInfo }
-            .filter { !pageState.isScrollInProgress }
-            .collect { pageState.updateCurrentPageBasedOnLazyListState() }
+    LaunchedEffect(state) {
+        snapshotFlow { state.currentLayoutPageInfo }
+            .filter { !state.isScrollInProgress }
+            .collect { state.updateCurrentPageBasedOnLazyListState() }
     }
 
     val pagerItems: (LazyListScope.() -> Unit) = {
@@ -76,24 +76,24 @@ fun Pager(
     if (orientation == Orientation.Vertical) {
         LazyColumn(
             modifier = modifier,
-            state = pageState.lazyListState,
+            state = state.lazyListState,
             contentPadding = contentPadding,
             reverseLayout = reverseLayout,
             verticalArrangement = Arrangement.spacedBy(pageSpacing, verticalAlignment),
             horizontalAlignment = horizontalAlignment,
-            flingBehavior = rememberSnapFlingBehavior(pageState.lazyListState),
+            flingBehavior = rememberSnapFlingBehavior(state.lazyListState),
             userScrollEnabled = userScrollEnabled,
             content = pagerItems
         )
     } else {
         LazyRow(
             modifier = modifier,
-            state = pageState.lazyListState,
+            state = state.lazyListState,
             contentPadding = contentPadding,
             reverseLayout = reverseLayout,
             horizontalArrangement = Arrangement.spacedBy(pageSpacing, horizontalAlignment),
             verticalAlignment = verticalAlignment,
-            flingBehavior = rememberSnapFlingBehavior(pageState.lazyListState),
+            flingBehavior = rememberSnapFlingBehavior(state.lazyListState),
             userScrollEnabled = userScrollEnabled,
             content = pagerItems
         )

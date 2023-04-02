@@ -22,11 +22,11 @@ fun TaskBoardPager(
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage == 0) {
             loadPrevDates(loadedDates[0])
-            pagerState.scrollToPage(1)
+            // pagerState.scrollToPage(1)
         }
         if (pagerState.currentPage == 2) {
             loadNextDates(loadedDates[2])
-            pagerState.scrollToPage(1)
+            // pagerState.scrollToPage(1)
         }
     }
 

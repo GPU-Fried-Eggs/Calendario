@@ -10,6 +10,7 @@ import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarIntent.*
 import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.utils.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -23,6 +24,9 @@ class CalendarViewModel : ViewModel() {
     }
 
     var visibleDates by mutableStateOf(formatWeekCalendarDate(LocalDate.now().getWeekRange()))
+        private set
+
+    var currentDay by mutableStateOf(LocalDate.now())
         private set
 
     var currentWeek by mutableStateOf(LocalDate.now().getWeekRange())
@@ -71,19 +75,26 @@ class CalendarViewModel : ViewModel() {
             }
             is SelectDate -> selectedDate = intent.date
             ExpandCalendar -> {
-                visibleDates = formatMonthCalendarDate(currentMonth)
+                viewModelScope.launch(Dispatchers.IO) {
+                    visibleDates = formatMonthCalendarDate(currentMonth)
+                }
                 expanded = true
             }
             CollapseCalendar -> {
-                val (selectStart, selectEnd) = selectedDate.getWeekRange()
-                if (selectStart.monthValue != selectEnd.monthValue) {
-                    if (selectedDate.monthValue != currentMonth.monthValue ||
-                        selectedDate.year != currentMonth.year) {
-                        currentMonth = selectEnd.getYearMonth()
+                viewModelScope.launch(Dispatchers.IO) {
+                    Pair(currentDay, selectedDate).let {
+                        if (it.first.monthValue == it.second.monthValue && it.first.year == it.second.year &&
+                            currentDay.until(selectedDate).days <= 14) it.first else it.second
+                    }.getWeekRange().let {
+                        if (it.first.monthValue != it.second.monthValue)
+                            if (it.second.monthValue != currentMonth.monthValue ||
+                                it.second.year != currentMonth.year)
+                                currentMonth = it.second.getYearMonth()
+                        if (it.first != currentWeek.first || it.second != currentWeek.second)
+                            currentWeek = it
                     }
-                    currentWeek = Pair(selectStart, selectEnd)
+                    visibleDates = formatWeekCalendarDate(currentWeek)
                 }
-                visibleDates = formatWeekCalendarDate(currentWeek)
                 expanded = false
             }
         }

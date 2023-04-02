@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.signora.calendario.models.CalendarItemState
 import com.signora.calendario.models.CalendarItemState.*
-import com.signora.calendario.ui.theme.CalendarioTheme
+import com.signora.calendario.ui.theme.CalendarTheme
 import java.time.LocalDate
 
 @Composable
@@ -33,16 +33,16 @@ fun CalenderItemView(
     val containerModifier = modifier.run {
         when (state) {
             is Selected -> background(
-                color = CalendarioTheme.colors.selectedItemBackgroundColor,
-                shape = CalendarioTheme.shapes.itemShape
+                color = CalendarTheme.colors.selectedItemBackgroundColor,
+                shape = CalendarTheme.shapes.itemShape
             )
             is Today -> background(
-                color = CalendarioTheme.colors.todayItemBackgroundColor,
-                shape = CalendarioTheme.shapes.itemShape
+                color = CalendarTheme.colors.todayItemBackgroundColor,
+                shape = CalendarTheme.shapes.itemShape
             )
             is Default -> background(
-                color = CalendarioTheme.colors.defaultItemBackgroundColor,
-                shape = CalendarioTheme.shapes.itemShape
+                color = CalendarTheme.colors.defaultItemBackgroundColor,
+                shape = CalendarTheme.shapes.itemShape
             )
         }
     }
@@ -58,7 +58,7 @@ fun CalenderItemView(
         Box(
             modifier = containerModifier
                 .aspectRatio(1f)
-                .clip(CalendarioTheme.shapes.itemShape)
+                .clip(CalendarTheme.shapes.itemShape)
                 .clickable { onDateSelect(date) }
         ) {
             Text(
@@ -66,7 +66,7 @@ fun CalenderItemView(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentHeight(),
-                color = CalendarioTheme.colors.run {
+                color = CalendarTheme.colors.run {
                     when (state) {
                         is Today -> onTodayItemBackgroundColor
                         is Selected -> onSelectedItemBackgroundColor

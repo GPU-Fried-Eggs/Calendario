@@ -27,7 +27,7 @@ class PagerStateTest {
         composeTestRule.setContent {
             Pager(
                 pageCount = count,
-                pageState = pagerState
+                state = pagerState
             ) { page ->
                 BasicText(text = "Page:$page")
             }

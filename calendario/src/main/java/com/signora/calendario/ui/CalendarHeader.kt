@@ -24,7 +24,7 @@ import com.signora.calendario.R
 import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarIntent.CollapseCalendar
 import com.signora.calendario.models.CalendarIntent.ExpandCalendar
-import com.signora.calendario.ui.theme.CalendarioTheme
+import com.signora.calendario.ui.theme.CalendarTheme
 import java.time.YearMonth
 import java.time.format.TextStyle
 
@@ -38,7 +38,7 @@ fun CalendarHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(6.dp)
-            .background(CalendarioTheme.colors.backgroundColor),
+            .background(CalendarTheme.colors.backgroundColor),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(Modifier.weight(1f))
@@ -49,7 +49,7 @@ fun CalendarHeader(
                     LocalContext.current.resources.configuration.locales[0]
                 )
             } ${currentMonth.year}",
-            color = CalendarioTheme.colors.onBackgroundColor,
+            color = CalendarTheme.colors.onBackgroundColor,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
@@ -63,7 +63,7 @@ fun CalendarHeader(
             Icon(
                 imageVector = Icons.Default.run { if (expanded) KeyboardArrowUp else KeyboardArrowDown },
                 contentDescription = stringResource(R.string.calendar_toggle_description),
-                tint = CalendarioTheme.colors.onBackgroundColor
+                tint = CalendarTheme.colors.onBackgroundColor
             )
         }
     }

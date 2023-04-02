@@ -27,7 +27,7 @@ fun Calendar(
     Column(
         modifier = Modifier
             .animateContentSize()
-            .background(CalendarioTheme.colors.backgroundColor)
+            .background(CalendarTheme.colors.backgroundColor)
     ) {
         headerContent?.let { it(calendarViewModel) }
         if (calendarViewModel.expanded) {
@@ -86,26 +86,21 @@ fun ExpandableCalendar(
 
 @Composable
 fun TaskBoardCalendar(
-    colors: Colors = if (isSystemInDarkTheme()) darkColors() else lightColors(),
-    shapes: Shapes = CalendarioTheme.shapes,
     onDateSelect: (LocalDate) -> Unit = {},
-    headerContent: @Composable (CalendarViewModel) -> Unit = { viewModel ->
-        CalendarHeader(
-            currentMonth = viewModel.displayMonth,
-            expanded = viewModel.expanded,
-            onStateChange = { viewModel.onIntent(it) }
-        )
-    },
-    footerContent: @Composable (CalendarViewModel) -> Unit = {
-    }
+    headerContent: @Composable ((CalendarViewModel) -> Unit)? = null,
+    footerContent: @Composable ((CalendarViewModel) -> Unit)? = null
 ) {
-    CalenderTheme(colors, shapes) {
-        Calendar(
-            onDateSelect = onDateSelect,
-            headerContent = headerContent,
-            footerContent = footerContent
-        )
-    }
+    Calendar(
+        onDateSelect = onDateSelect,
+        headerContent = headerContent ?: { viewModel ->
+            CalendarHeader(
+                currentMonth = viewModel.displayMonth,
+                expanded = viewModel.expanded,
+                onStateChange = { viewModel.onIntent(it) }
+            )
+        },
+        footerContent = footerContent
+    )
 }
 
 @Preview

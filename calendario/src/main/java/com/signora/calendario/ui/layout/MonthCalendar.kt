@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarItemState.Companion.getState
 import com.signora.calendario.ui.CalendarPager
-import com.signora.calendario.ui.theme.CalendarioTheme
+import com.signora.calendario.ui.theme.CalendarTheme
 import com.signora.calendario.viewmodels.CalendarViewModel
 import com.signora.calendario.views.CalenderItemView
 import java.time.DayOfWeek
@@ -66,7 +66,7 @@ fun MonthCalendar(
                                                 java.time.format.TextStyle.SHORT,
                                                 LocalContext.current.resources.configuration.locales[0]
                                             ),
-                                            color = CalendarioTheme.colors.onBackgroundColor,
+                                            color = CalendarTheme.colors.onBackgroundColor,
                                             fontSize = 10.sp
                                         )
                                 )

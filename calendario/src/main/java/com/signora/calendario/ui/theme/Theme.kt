@@ -3,9 +3,9 @@ package com.signora.calendario.ui.theme
 import androidx.compose.runtime.*
 
 @Composable
-fun CalenderTheme(
-    colors: Colors = CalendarioTheme.colors,
-    shapes: Shapes = CalendarioTheme.shapes,
+fun CalendarTheme(
+    colors: Colors = CalendarTheme.colors,
+    shapes: Shapes = CalendarTheme.shapes,
     content: @Composable () -> Unit
 ) {
     val rememberedColors = remember { colors.copy() }.apply { updateColorsFrom(colors) }
@@ -17,7 +17,7 @@ fun CalenderTheme(
     )
 }
 
-object CalendarioTheme {
+object CalendarTheme {
     val colors: Colors
         @Composable
         @ReadOnlyComposable
