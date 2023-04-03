@@ -6,12 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.ViewModel
 import com.signora.calendario.models.CalendarPeriod
-import com.signora.calendario.models.Task
+import com.signora.calendario.models.KanbanTask
 
-class TaskViewModel : ViewModel() {
-    var taskPlanList = mutableStateListOf<Task>()
+class KanbanViewModel<T>() : ViewModel() {
+    var taskPlanList = mutableStateListOf<T>()
 
-    var taskDoneList = mutableStateListOf<Task>()
+    var taskDoneList = mutableStateListOf<T>()
 
     var scalarText = mutableStateListOf<String>()
 

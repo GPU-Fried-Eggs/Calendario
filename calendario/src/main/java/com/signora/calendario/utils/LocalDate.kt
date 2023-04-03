@@ -39,7 +39,7 @@ internal fun LocalDate.getRemainingDatesInWeek(weekStartDay: DayOfWeek = DayOfWe
 }
 
 internal fun LocalDate.getWeekRange(weekStartDay: DayOfWeek = DayOfWeek.MONDAY): Pair<LocalDate, LocalDate> {
-    return Pair(this.getWeekStartDate(weekStartDay), this.getWeekEndDate(weekStartDay))
+    return this.getWeekStartDate(weekStartDay) to this.getWeekEndDate(weekStartDay)
 }
 
 internal fun LocalDate.getMonthStartDate(): LocalDate {

@@ -16,24 +16,24 @@ import com.signora.calendario.models.CalendarItemState.Companion.getState
 import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.ui.CalendarPager
 import com.signora.calendario.ui.theme.CalendarTheme
+import com.signora.calendario.utils.formatNeighborWeek
 import com.signora.calendario.viewmodels.CalendarViewModel
 import com.signora.calendario.views.CalenderItemView
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.YearMonth
 
 @Composable
 fun WeekCalendar(
     loadedDates: Array<List<LocalDate>>,
-    loadedMonthWeek: Array<Pair<YearMonth, Pair<LocalDate, LocalDate>?>>,
-    loadDatesForMonthWeek: (Pair<YearMonth, Pair<LocalDate, LocalDate>?>) -> Unit,
+    loadedMonthWeek: Array<Pair<LocalDate, LocalDate>>,
+    loadDatesForMonthWeek: (Pair<LocalDate, LocalDate>) -> Unit,
     selectedDate: LocalDate? = null,
     onDateSelect: (LocalDate) -> Unit,
     childrenHeaderContent: @Composable (() -> Unit)? = null,
     childrenFooterContent: @Composable (() -> Unit)? = null
 ) {
     CalendarPager(
-        loadedMonthWeek = loadedMonthWeek,
+        loadedDate = loadedMonthWeek,
         loadPrevDates = loadDatesForMonthWeek,
         loadNextDates = loadDatesForMonthWeek
     ) { currentPage ->
@@ -77,12 +77,10 @@ fun WeekCalendar(
 
 @Preview
 @Composable
-private fun WeekCalendarPreview() {
-    val calendarViewModel: CalendarViewModel = viewModel()
-
+private fun WeekCalendarPreview(calendarViewModel: CalendarViewModel = viewModel()) {
     WeekCalendar(
         loadedDates = calendarViewModel.visibleDates,
-        loadedMonthWeek = calendarViewModel.formatNeighborWeek(calendarViewModel.currentWeek).toTypedArray(),
+        loadedMonthWeek = calendarViewModel.currentWeek.formatNeighborWeek().toTypedArray(),
         loadDatesForMonthWeek = {
             calendarViewModel.onIntent(CalendarIntent.LoadDate(it, period = CalendarPeriod.WEEK))
         },

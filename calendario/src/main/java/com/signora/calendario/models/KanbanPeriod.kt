@@ -1,6 +1,6 @@
 package com.signora.calendario.models
 
-enum class TaskBoardPeriod {
+enum class KanbanPeriod {
     WEEK,
     DAY
 }

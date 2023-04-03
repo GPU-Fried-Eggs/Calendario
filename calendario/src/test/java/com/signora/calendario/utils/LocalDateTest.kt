@@ -44,10 +44,7 @@ class LocalDateTest {
     @Test
     fun `when getWeekRange is called, should get a pair of start day and end day`() {
         assertEquals(
-            Pair(
-                LocalDate.of(2022, 12, 26),
-                LocalDate.of(2023, 1, 1)
-            ),
+            LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1),
             LocalDate.of(2023, 1, 1).getWeekRange()
         )
     }

@@ -2,7 +2,6 @@ package com.signora.calendario
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,6 +13,8 @@ import com.signora.calendario.ui.CalendarHeader
 import com.signora.calendario.ui.layout.MonthCalendar
 import com.signora.calendario.ui.layout.WeekCalendar
 import com.signora.calendario.ui.theme.*
+import com.signora.calendario.utils.formatNeighborMonth
+import com.signora.calendario.utils.formatNeighborWeek
 import com.signora.calendario.viewmodels.CalendarViewModel
 import java.time.LocalDate
 
@@ -33,12 +34,8 @@ fun Calendar(
         if (calendarViewModel.expanded) {
             MonthCalendar(
                 loadedDates = calendarViewModel.visibleDates,
-                loadedMonth = arrayOf(
-                    calendarViewModel.currentMonth.minusMonths(1),
-                    calendarViewModel.currentMonth,
-                    calendarViewModel.currentMonth.plusMonths(1)
-                ),
-                loadDatesForMonth = {
+                loadedYearMonth = calendarViewModel.currentMonth.formatNeighborMonth().toTypedArray(),
+                loadDatesForYearMonth = {
                     calendarViewModel.onIntent(CalendarIntent.LoadDate(it))
                 },
                 selectedDate = calendarViewModel.selectedDate,
@@ -50,7 +47,7 @@ fun Calendar(
         } else {
             WeekCalendar(
                 loadedDates = calendarViewModel.visibleDates,
-                loadedMonthWeek = calendarViewModel.formatNeighborWeek(calendarViewModel.currentWeek).toTypedArray(),
+                loadedMonthWeek = calendarViewModel.currentWeek.formatNeighborWeek().toTypedArray(),
                 loadDatesForMonthWeek = {
                     calendarViewModel.onIntent(CalendarIntent.LoadDate(it, period = CalendarPeriod.WEEK))
                 },
@@ -75,7 +72,7 @@ fun ExpandableCalendar(
         onDateSelect = onDateSelect,
         headerContent = headerContent ?: { viewModel ->
             CalendarHeader(
-                currentMonth = viewModel.displayMonth,
+                currentYearMonth = viewModel.displayMonth,
                 expanded = viewModel.expanded,
                 onStateChange = { viewModel.onIntent(it) }
             )
@@ -85,7 +82,7 @@ fun ExpandableCalendar(
 }
 
 @Composable
-fun TaskBoardCalendar(
+fun KanbanCalendar(
     onDateSelect: (LocalDate) -> Unit = {},
     headerContent: @Composable ((CalendarViewModel) -> Unit)? = null,
     footerContent: @Composable ((CalendarViewModel) -> Unit)? = null
@@ -94,7 +91,7 @@ fun TaskBoardCalendar(
         onDateSelect = onDateSelect,
         headerContent = headerContent ?: { viewModel ->
             CalendarHeader(
-                currentMonth = viewModel.displayMonth,
+                currentYearMonth = viewModel.displayMonth,
                 expanded = viewModel.expanded,
                 onStateChange = { viewModel.onIntent(it) }
             )
@@ -106,7 +103,7 @@ fun TaskBoardCalendar(
 @Preview
 @Composable
 private fun CalendarPreview() {
-    TaskBoardCalendar()
+    Calendar()
 }
 
 @Preview
@@ -117,6 +114,6 @@ private fun ExpandableCalendarPreview() {
 
 @Preview
 @Composable
-private fun TaskBoardCalendarPreview() {
-    TaskBoardCalendar()
+private fun KanbanCalendarPreview() {
+    KanbanCalendar()
 }

@@ -18,47 +18,43 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.signora.calendario.ui.pager.Pager
 import com.signora.calendario.ui.pager.PagerState
-import java.time.LocalDate
-import java.time.YearMonth
 
 @Composable
-fun CalendarPager(
-    pageCount: Int = 3,
+fun <T> CalendarPager(
+    loadedDate: Array<T>,
+    middleIndex: Int = loadedDate.size / 2, // TODO: Auto Even -> Odd feature
+    loadPrevDates: (T) -> Unit = {},
+    loadNextDates: (T) -> Unit = {},
     orientation: Orientation = Orientation.Horizontal,
-    loadedMonthWeek: Array<Pair<YearMonth, Pair<LocalDate, LocalDate>?>>,
-    loadPrevDates: (Pair<YearMonth, Pair<LocalDate, LocalDate>?>) -> Unit,
-    loadNextDates: (Pair<YearMonth, Pair<LocalDate, LocalDate>?>) -> Unit,
     pageContent: @Composable (currentPage: Int) -> Unit
 ) {
-    val pagerState = rememberSaveable(saver = PagerState.Saver) { PagerState(1) }
+    val pagerState = rememberSaveable(saver = PagerState.Saver) { PagerState(middleIndex) }
 
     LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage == 0) loadPrevDates(loadedMonthWeek[0])
-        if (pagerState.currentPage == 2) loadNextDates(loadedMonthWeek[2])
+        pagerState.currentPage.let {
+            when (it) {
+                in 0 until middleIndex -> loadPrevDates(loadedDate[it])
+                in middleIndex + 1..loadedDate.size -> loadNextDates(loadedDate[it])
+            }
+        }
     }
 
-    LaunchedEffect(loadedMonthWeek) {
-        pagerState.scrollToPage(1)
+    LaunchedEffect(loadedDate) {
+        pagerState.scrollToPage(middleIndex)
     }
 
     Pager(
-        pageCount = pageCount,
+        pageCount = loadedDate.size,
         state = pagerState,
         orientation = orientation,
         pageContent = pageContent
-    );
+    )
 }
 
 @Preview
 @Composable
 private fun CalendarPagerPreview() {
-    CalendarPager(
-        loadedMonthWeek = Array(3) {
-            Pair(YearMonth.now(), Pair(LocalDate.now(), LocalDate.now()))
-        },
-        loadNextDates = {},
-        loadPrevDates = {}
-    ) {
+    CalendarPager(arrayOf(0, 1, 2)){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,8 +64,8 @@ private fun CalendarPagerPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "preview",
-                style = MaterialTheme.typography.h2
+                text = "preview page $it",
+                style = MaterialTheme.typography.h3
             )
         }
     }

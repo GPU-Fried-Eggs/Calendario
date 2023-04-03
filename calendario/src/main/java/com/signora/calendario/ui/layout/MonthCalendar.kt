@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -16,6 +17,7 @@ import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarItemState.Companion.getState
 import com.signora.calendario.ui.CalendarPager
 import com.signora.calendario.ui.theme.CalendarTheme
+import com.signora.calendario.utils.formatNeighborMonth
 import com.signora.calendario.viewmodels.CalendarViewModel
 import com.signora.calendario.views.CalenderItemView
 import java.time.DayOfWeek
@@ -26,22 +28,22 @@ import java.time.YearMonth
 @Composable
 fun MonthCalendar(
     loadedDates: Array<List<LocalDate>>,
-    loadedMonth: Array<YearMonth>,
-    loadDatesForMonth: (Pair<YearMonth, Pair<LocalDate, LocalDate>?>) -> Unit,
+    loadedYearMonth: Array<YearMonth>,
+    loadDatesForYearMonth: (YearMonth) -> Unit,
     selectedDate: LocalDate? = null,
     onDateSelect: (LocalDate) -> Unit,
     childrenHeaderContent: @Composable (() -> Unit)? = null,
     childrenFooterContent: @Composable (() -> Unit)? = null
 ) {
     CalendarPager(
-        loadedMonthWeek = loadedMonth.map { Pair(it, null) }.toTypedArray(),
-        loadNextDates = loadDatesForMonth,
-        loadPrevDates = loadDatesForMonth
+        loadedDate = loadedYearMonth,
+        loadNextDates = loadDatesForYearMonth,
+        loadPrevDates = loadDatesForYearMonth
     ) { currentPage ->
         BoxWithConstraints {
             val parentWidth = this.maxWidth
 
-            FlowRow(Modifier.height(355.dp)) {
+            FlowRow {
                 loadedDates[currentPage].forEachIndexed { index, date ->
                     Box(
                         modifier = Modifier
@@ -51,8 +53,8 @@ fun MonthCalendar(
                     ) {
                         CalenderItemView(
                             modifier = Modifier.alpha(
-                                if (date.isAfter(loadedMonth[currentPage].atEndOfMonth()) ||
-                                    date.isBefore(loadedMonth[currentPage].atDay(1)))
+                                if (date.isAfter(loadedYearMonth[currentPage].atEndOfMonth()) ||
+                                    date.isBefore(loadedYearMonth[currentPage].atDay(1)))
                                     0.5f else 1f
                             ),
                             date = date,
@@ -82,21 +84,15 @@ fun MonthCalendar(
 
 @Preview
 @Composable
-private fun MonthCalendarPreview() {
-    val calendarViewModel: CalendarViewModel = viewModel()
-
+private fun MonthCalendarPreview(calendarViewModel: CalendarViewModel = viewModel()) {
     LaunchedEffect(Unit) {
         calendarViewModel.onIntent(CalendarIntent.ExpandCalendar)
     }
 
     MonthCalendar(
         loadedDates = calendarViewModel.visibleDates,
-        loadedMonth = arrayOf(
-            calendarViewModel.currentMonth.minusMonths(1),
-            calendarViewModel.currentMonth,
-            calendarViewModel.currentMonth.plusMonths(1)
-        ),
-        loadDatesForMonth = {
+        loadedYearMonth = calendarViewModel.currentMonth.formatNeighborMonth().toTypedArray(),
+        loadDatesForYearMonth = {
             calendarViewModel.onIntent(CalendarIntent.LoadDate(it))
         },
         selectedDate = calendarViewModel.selectedDate,

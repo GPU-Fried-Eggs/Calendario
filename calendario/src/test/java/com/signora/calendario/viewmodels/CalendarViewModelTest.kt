@@ -26,10 +26,6 @@ class CalendarViewModelTest {
 
     @Test
     fun `all members in the view-model should be initialized`() {
-        assertEquals(viewModel.cachedDates.size(), 3)
-        assert(YearMonth.now().minusMonths(1) in viewModel.cachedDates.snapshot())
-        assert(YearMonth.now() in viewModel.cachedDates.snapshot())
-        assert(YearMonth.now().plusMonths(1) in viewModel.cachedDates.snapshot())
         assertEquals(viewModel.visibleDates.size, 3)
         assertEquals(viewModel.selectedDate, LocalDate.now())
         assertEquals(viewModel.currentWeek, LocalDate.now().getWeekRange())
@@ -43,43 +39,15 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `when formatNeighborWeek is called, should return a group of YearMonth`() {
-        assertArrayEquals(
-            arrayOf(
-                Pair(YearMonth.of(2022, 12), Pair(LocalDate.of(2022, 12, 19), LocalDate.of(2022, 12, 25))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2022, 12, 26), LocalDate.of(2023, 1, 1))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 8)))
-            ),
-            viewModel.formatNeighborWeek(Pair(LocalDate.of(2022, 12, 26), LocalDate.of(2023, 1, 1))).toTypedArray()
-        )
-    }
-
-    @Test
-    fun `when formatNeighborWeek with 3 range is called, should return a group of YearMonth`() {
-        assertArrayEquals(
-            arrayOf(
-                Pair(YearMonth.of(2022, 12), Pair(LocalDate.of(2022, 12, 5), LocalDate.of(2022, 12, 11))),
-                Pair(YearMonth.of(2022, 12), Pair(LocalDate.of(2022, 12, 12), LocalDate.of(2022, 12, 18))),
-                Pair(YearMonth.of(2022, 12), Pair(LocalDate.of(2022, 12, 19), LocalDate.of(2022, 12, 25))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2022, 12, 26), LocalDate.of(2023, 1, 1))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 8))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2023, 1, 9), LocalDate.of(2023, 1, 15))),
-                Pair(YearMonth.of(2023, 1), Pair(LocalDate.of(2023, 1, 16), LocalDate.of(2023, 1, 22)))
-            ),
-            viewModel.formatNeighborWeek(Pair(LocalDate.of(2022, 12, 26), LocalDate.of(2023, 1, 1)), 3).toTypedArray()
-        )
-    }
-
-    @Test
-    fun `when formatWeekCalendarDate is called should load or get from cache`() {
+    fun `when formatWeekCalendarDate is called, should load or get from cache`() {
         assertArrayEquals(
             LocalDate.of(2022, 12, 26).minusWeeks(1).getNextDates(21).chunked(7).toTypedArray(),
-            viewModel.formatWeekCalendarDate(Pair(LocalDate.of(2022, 12, 26), LocalDate.of(2023, 1, 1)))
+            viewModel.formatWeekCalendarDate(LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1))
         )
     }
 
     @Test
-    fun `when formatMonthCalendarDate is called should load or get from cache`() {
+    fun `when formatMonthCalendarDate is called, should load or get from cache`() {
         assertArrayEquals(
             arrayOf(
                 calculateMonthTable(YearMonth.of(2022, 12)),

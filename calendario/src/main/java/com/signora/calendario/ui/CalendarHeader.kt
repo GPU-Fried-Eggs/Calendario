@@ -30,7 +30,7 @@ import java.time.format.TextStyle
 
 @Composable
 fun CalendarHeader(
-    currentMonth: YearMonth,
+    currentYearMonth: YearMonth,
     expanded: Boolean,
     onStateChange: (CalendarIntent) -> Unit
 ) {
@@ -44,11 +44,11 @@ fun CalendarHeader(
         Spacer(Modifier.weight(1f))
         Text(
             text = "${
-                currentMonth.month.getDisplayName(
+                currentYearMonth.month.getDisplayName(
                     TextStyle.FULL_STANDALONE,
                     LocalContext.current.resources.configuration.locales[0]
                 )
-            } ${currentMonth.year}",
+            } ${currentYearMonth.year}",
             color = CalendarTheme.colors.onBackgroundColor,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -75,7 +75,7 @@ private fun CalendarHeaderPreview() {
     var calendarExpanded by remember { mutableStateOf(false) }
 
     CalendarHeader(
-        currentMonth = YearMonth.now(),
+        currentYearMonth = YearMonth.now(),
         expanded = calendarExpanded,
         onStateChange = { calendarExpanded = !calendarExpanded }
     )

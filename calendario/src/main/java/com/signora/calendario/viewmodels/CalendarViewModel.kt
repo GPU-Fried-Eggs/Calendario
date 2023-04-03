@@ -10,18 +10,14 @@ import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarIntent.*
 import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.utils.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.math.abs
 
 class CalendarViewModel : ViewModel() {
-    val cachedDates = LruCache<YearMonth, List<LocalDate>>(12 * 3).apply {
-        put(YearMonth.now().minusMonths(1), calculateMonthTable(YearMonth.now(), -1))
-        put(YearMonth.now(), calculateMonthTable(YearMonth.now()))
-        put(YearMonth.now().plusMonths(1), calculateMonthTable(YearMonth.now(), 1))
-    }
+    internal val cachedDates = LruCache<YearMonth, List<LocalDate>>(12 * 3)
 
     var visibleDates by mutableStateOf(formatWeekCalendarDate(LocalDate.now().getWeekRange()))
         private set
@@ -43,55 +39,81 @@ class CalendarViewModel : ViewModel() {
 
     val displayMonth: YearMonth
         get() {
-            val current = visibleDates[1]
-            return when (expanded) {
-                true -> current[current.size / 2]
-                false -> currentWeek.let { (start, end) ->
-                    if (current.count { it.monthValue == start.monthValue } > 3) start else end
-                }
-            }.getYearMonth()
+            return visibleDates[visibleDates.size / 2].let { middleMonth ->
+                when (expanded) {
+                    true -> middleMonth[middleMonth.size / 2]
+                    false -> currentWeek.let { (start, end) ->
+                        if (middleMonth.count { it.monthValue == start.monthValue } > 3) start else end
+                    }
+                }.getYearMonth()
+            }
         }
 
-    init { formatDateCacheByRange(currentMonth, 6) }
+    init {
+        formatDateCacheByRange(
+            yearMonth = currentMonth,
+            range = 3
+        )
+    }
 
     fun onIntent(intent: CalendarIntent) {
         when (intent) {
             is LoadDate -> {
                 when (intent.period) {
                     CalendarPeriod.MONTH -> {
-                        currentMonth = intent.monthWeek.first
-                        currentWeek = intent.monthWeek.first.atDay(1).getWeekRange()
-                        visibleDates = formatMonthCalendarDate(currentMonth)
-                        formatDateCacheByRange(currentMonth, intent.range)
+                        viewModelScope.launch {
+                            val targetYearMonth = intent.date as YearMonth
+                            currentMonth = targetYearMonth
+                            currentWeek = targetYearMonth.atDay(1).getWeekRange()
+                            visibleDates = formatMonthCalendarDate(
+                                yearMonth = targetYearMonth,
+                                range = intent.range.toLong()
+                            )
+                        }
                     }
                     CalendarPeriod.WEEK -> {
-                        currentMonth = intent.monthWeek.first
-                        currentWeek = requireNotNull(intent.monthWeek.second)
-                        visibleDates = formatWeekCalendarDate(currentWeek)
-                        if (currentWeek.first.monthValue != currentWeek.second.monthValue)
-                            formatDateCacheByRange(currentMonth, intent.range)
+                        viewModelScope.launch {
+                            val (targetHead, targetTail) = intent.date as Pair<*, *>
+                            targetHead as LocalDate; targetTail as LocalDate
+                            currentMonth = targetTail.getYearMonth()
+                            currentWeek = targetHead to targetTail
+                            visibleDates = formatWeekCalendarDate(
+                                week = targetHead to targetTail,
+                                range = intent.range.toLong()
+                            )
+                            if (targetHead.monthValue != targetTail.monthValue)
+                                formatDateCacheByRange(
+                                    yearMonth = targetTail.getYearMonth(),
+                                    range = intent.range.toLong(),
+                                    scope = this
+                                )
+                        }
                     }
                 }
             }
             is SelectDate -> selectedDate = intent.date
             ExpandCalendar -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     visibleDates = formatMonthCalendarDate(currentMonth)
                 }
                 expanded = true
             }
             CollapseCalendar -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    Pair(currentDay, selectedDate).let {
-                        if (it.first.monthValue == it.second.monthValue && it.first.year == it.second.year &&
-                            currentDay.until(selectedDate).days <= 14) it.first else it.second
-                    }.getWeekRange().let {
-                        if (it.first.monthValue != it.second.monthValue)
-                            if (it.second.monthValue != currentMonth.monthValue ||
-                                it.second.year != currentMonth.year)
-                                currentMonth = it.second.getYearMonth()
-                        if (it.first != currentWeek.first || it.second != currentWeek.second)
-                            currentWeek = it
+                viewModelScope.launch {
+                    (currentDay to selectedDate).let { (current, selected) ->
+                        if (current.year == selected.year && current.monthValue == selected.monthValue &&
+                            currentDay.until(selectedDate).days <= 14) current else selected
+                    }.getWeekRange().let { (head, tail) ->
+                        when {
+                            head.year == currentMonth.year && head.monthValue == currentMonth.monthValue -> { // headTouch
+                                if (head.monthValue != tail.monthValue)
+                                    currentMonth = tail.getYearMonth()
+                                currentWeek = head to tail
+                            }
+                            tail.year == currentMonth.year && tail.monthValue == currentMonth.monthValue -> { // tailTouch
+                                currentWeek = head to tail
+                            }
+                        }
                     }
                     visibleDates = formatWeekCalendarDate(currentWeek)
                 }
@@ -100,54 +122,27 @@ class CalendarViewModel : ViewModel() {
         }
     }
 
-    internal fun formatNeighborWeek(week: Pair<LocalDate, LocalDate>, rangeOfWeek: Long = 1): List<Pair<YearMonth, Pair<LocalDate, LocalDate>>> {
-        val (lastStartDay, lastEndDay) = Pair(week.first.plusWeeks(rangeOfWeek), week.second.plusWeeks(rangeOfWeek))
-        return List((1 + (2 * rangeOfWeek)).toInt()) {
-            val current = Pair(lastStartDay.minusWeeks(it.toLong()), lastEndDay.minusWeeks(it.toLong()))
-            Pair(current.second.getYearMonth(), current)
-        }.reversed()
-    }
-
-    internal fun formatWeekCalendarDate(week: Pair<LocalDate, LocalDate>): Array<List<LocalDate>> {
-        return formatNeighborWeek(week).map { (yearMonth, week) ->
-            cachedDates[yearMonth]?.let {
-                it.subList(it.indexOf(week.first), it.indexOf(week.second) + 1)
-            } ?: week.first.getNextDates(7)
+    internal fun formatWeekCalendarDate(week: Pair<LocalDate, LocalDate>, range: Long = 1): Array<List<LocalDate>> {
+        return week.formatNeighborWeek(range).map { (head, tail) ->
+            cachedDates[tail.getYearMonth()]?.run {
+                subList(indexOf(head), indexOf(tail) + 1)
+            } ?: head.getNextDates(7)
         }.toTypedArray()
     }
 
-    internal fun formatMonthCalendarDate(yearMonth: YearMonth): Array<List<LocalDate>> {
-        return Array(3) { index ->
-            when {
-                index < 1 -> {
-                    val prevYearMonth = yearMonth.minusMonths(1)
-                    cachedDates[prevYearMonth] ?: run {
-                        val table = calculateMonthTable(prevYearMonth)
-                        cachedDates.put(prevYearMonth, table)
-                        table
-                    }
-                }
-                index > 1 -> {
-                    val nextYearMonth = yearMonth.plusMonths(1)
-                    cachedDates[nextYearMonth] ?: run {
-                        val table = calculateMonthTable(nextYearMonth)
-                        cachedDates.put(nextYearMonth, table)
-                        table
-                    }
-                }
-                else -> {
-                    cachedDates[yearMonth] ?: run {
-                        val table = calculateMonthTable(yearMonth)
-                        cachedDates.put(yearMonth, table)
-                        table
-                    }
-                }
+    internal fun formatMonthCalendarDate(yearMonth: YearMonth, range: Long = 1): Array<List<LocalDate>> {
+        return yearMonth.formatNeighborMonth(range).map {
+            cachedDates[it] ?: run {
+                val table = calculateMonthTable(it)
+                cachedDates.put(it, table)
+                table
             }
-        }
+        }.toTypedArray()
     }
 
-    internal fun formatDateCacheByRange(yearMonth: YearMonth, range: Int = 1) {
-        viewModelScope.launch {
+
+    internal fun formatDateCacheByRange(yearMonth: YearMonth, range: Long = 1, scope: CoroutineScope = viewModelScope) {
+        scope.launch {
             cachedDates[yearMonth] ?: run {
                 cachedDates.put(yearMonth, calculateMonthTable(yearMonth))
             }
@@ -156,8 +151,8 @@ class CalendarViewModel : ViewModel() {
                 launch {
                     val key = YearMonth.of(yearMonth.year, yearMonth.month).run {
                         when {
-                            offset > 0 -> plusMonths(offset.toLong())
-                            offset < 0 -> minusMonths(abs(offset.toLong()))
+                            offset > 0 -> plusMonths(offset)
+                            offset < 0 -> minusMonths(abs(offset))
                             else -> null
                         }
                     }
