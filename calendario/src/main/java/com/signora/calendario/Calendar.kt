@@ -12,15 +12,14 @@ import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.ui.CalendarHeader
 import com.signora.calendario.ui.layout.MonthCalendar
 import com.signora.calendario.ui.layout.WeekCalendar
-import com.signora.calendario.ui.theme.*
-import com.signora.calendario.utils.formatNeighborMonth
-import com.signora.calendario.utils.formatNeighborWeek
+import com.signora.calendario.ui.theme.CalendarTheme
 import com.signora.calendario.viewmodels.CalendarViewModel
 import java.time.LocalDate
 
 @Composable
 fun Calendar(
     onDateSelect: (LocalDate) -> Unit = {},
+    cacheRange: Int = 2,
     calendarViewModel: CalendarViewModel = viewModel(),
     headerContent: @Composable ((CalendarViewModel) -> Unit)? = null,
     footerContent: @Composable ((CalendarViewModel) -> Unit)? = null
@@ -34,9 +33,9 @@ fun Calendar(
         if (calendarViewModel.expanded) {
             MonthCalendar(
                 loadedDates = calendarViewModel.visibleDates,
-                loadedYearMonth = calendarViewModel.currentMonth.formatNeighborMonth().toTypedArray(),
+                loadedYearMonth = calendarViewModel.neighborMonth,
                 loadDatesForYearMonth = {
-                    calendarViewModel.onIntent(CalendarIntent.LoadDate(it))
+                    calendarViewModel.onIntent(CalendarIntent.LoadDate(it, cacheRange))
                 },
                 selectedDate = calendarViewModel.selectedDate,
                 onDateSelect = {
@@ -47,9 +46,9 @@ fun Calendar(
         } else {
             WeekCalendar(
                 loadedDates = calendarViewModel.visibleDates,
-                loadedMonthWeek = calendarViewModel.currentWeek.formatNeighborWeek().toTypedArray(),
+                loadedMonthWeek = calendarViewModel.neighborWeek,
                 loadDatesForMonthWeek = {
-                    calendarViewModel.onIntent(CalendarIntent.LoadDate(it, period = CalendarPeriod.WEEK))
+                    calendarViewModel.onIntent(CalendarIntent.LoadDate(it, cacheRange, period = CalendarPeriod.WEEK))
                 },
                 selectedDate = calendarViewModel.selectedDate,
                 onDateSelect = {

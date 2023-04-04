@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.models.KanbanTask
 
-class KanbanViewModel<T>() : ViewModel() {
+class KanbanViewModel<T: KanbanTask> : ViewModel() {
     var taskPlanList = mutableStateListOf<T>()
 
     var taskDoneList = mutableStateListOf<T>()

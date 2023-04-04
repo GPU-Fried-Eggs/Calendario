@@ -16,7 +16,6 @@ import java.time.LocalDateTime
 
 @Composable
 fun DailyKanban(
-    modifier: Modifier = Modifier,
     selectDate: LocalDate,
     onSelectDateChange: (LocalDate) -> Unit = {},
     taskPlanList: List<KanbanTask>,
@@ -26,7 +25,7 @@ fun DailyKanban(
 
     Box(Modifier.verticalScroll(state)) {
         KanbanGridView(
-            modifier = Modifier.requiredHeight(2048.dp).then(modifier),
+            modifier = Modifier.requiredHeight(2048.dp),
             timeScalar = (0..23).map {
                 LocalDateTime.of(2023, 1, 1, it, 0, 0)
             },

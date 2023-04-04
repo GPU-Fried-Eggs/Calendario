@@ -1,5 +1,6 @@
 package com.signora.calendario.pager
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,7 @@ class PagerStateTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Test
     fun scroll_and_change_page_count() {
         val pagerState = PagerState()

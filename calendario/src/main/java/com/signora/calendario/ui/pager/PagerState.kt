@@ -17,14 +17,19 @@ class PagerState(initialPage: Int = 0) : ScrollableState {
 
     var currentPage by mutableStateOf(initialPage)
 
+    var pageSpacing by mutableStateOf(0)
+
     val pageCount: Int by derivedStateOf { lazyListState.layoutInfo.totalItemsCount }
+
+    val pageSize: Int
+        get() = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull()?.size ?: 0
 
     val currentLayoutPageInfo: LazyListItemInfo?
         get() = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull { it.offset <= 0 }
 
     suspend fun scrollToPage(page: Int, pageOffset: Float = 0f) {
         try {
-            val targetPage = page.coerceInPageRange()
+            val targetPage = if (pageCount > 0) { page.coerceIn(0, pageCount - 1) } else { 0 }
 
             animationTargetPage = targetPage
 
@@ -35,7 +40,7 @@ class PagerState(initialPage: Int = 0) : ScrollableState {
             if (pageOffset > 0.0001f) {
                 currentLayoutPageInfo?.let {
                     scroll {
-                        scrollBy(it.size * pageOffset)
+                        scrollBy((it.size + pageSpacing) * pageOffset)
                     }
                 }
             }
@@ -43,8 +48,6 @@ class PagerState(initialPage: Int = 0) : ScrollableState {
             onScrollFinished()
         }
     }
-
-    private fun Int.coerceInPageRange() = if (pageCount > 0) { coerceIn(0, pageCount - 1) } else { 0 }
 
     internal fun updateCurrentPageBasedOnLazyListState() {
         currentLayoutPageInfo?.let{ currentPage = it.index }

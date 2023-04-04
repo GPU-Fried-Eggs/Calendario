@@ -1,7 +1,6 @@
 package com.signora.calendario.models
 
 import java.time.LocalDate
-import java.time.YearMonth
 
 sealed interface CalendarIntent {
     data class LoadDate(val date: Any, val range: Int = 1, val period: CalendarPeriod = CalendarPeriod.MONTH) : CalendarIntent

@@ -44,7 +44,7 @@ class CalendarTest {
                 LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1),
                 LocalDate.of(2023, 1, 2) to LocalDate.of(2023, 1, 8)
             ),
-            (LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1)).formatNeighborWeek().toTypedArray()
+            (LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1)).formatNeighborWeek()
         )
     }
 
@@ -60,7 +60,7 @@ class CalendarTest {
                 LocalDate.of(2023, 1, 9) to LocalDate.of(2023, 1, 15),
                 LocalDate.of(2023, 1, 16) to LocalDate.of(2023, 1, 22)
             ),
-            (LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1)).formatNeighborWeek(3).toTypedArray()
+            (LocalDate.of(2022, 12, 26) to LocalDate.of(2023, 1, 1)).formatNeighborWeek(3)
         )
     }
 
@@ -72,7 +72,7 @@ class CalendarTest {
                 YearMonth.of(2023, 1),
                 YearMonth.of(2023, 2)
             ),
-            YearMonth.of(2023, 1).formatNeighborMonth().toTypedArray()
+            YearMonth.of(2023, 1).formatNeighborMonth()
         )
     }
 
@@ -88,7 +88,7 @@ class CalendarTest {
                 YearMonth.of(2023, 3),
                 YearMonth.of(2023, 4)
             ),
-            YearMonth.of(2023, 1).formatNeighborMonth(3).toTypedArray()
+            YearMonth.of(2023, 1).formatNeighborMonth(3)
         )
     }
 }

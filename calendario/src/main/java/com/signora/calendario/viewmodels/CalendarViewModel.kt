@@ -19,7 +19,9 @@ import kotlin.math.abs
 class CalendarViewModel : ViewModel() {
     internal val cachedDates = LruCache<YearMonth, List<LocalDate>>(12 * 3)
 
-    var visibleDates by mutableStateOf(formatWeekCalendarDate(LocalDate.now().getWeekRange()))
+    var dateLoadingRange by mutableStateOf(1)
+
+    var visibleDates by mutableStateOf(formatWeekCalendarDate(LocalDate.now().getWeekRange(), dateLoadingRange))
         private set
 
     var currentDay by mutableStateOf(LocalDate.now())
@@ -49,12 +51,13 @@ class CalendarViewModel : ViewModel() {
             }
         }
 
-    init {
-        formatDateCacheByRange(
-            yearMonth = currentMonth,
-            range = 3
-        )
-    }
+    val neighborWeek: Array<Pair<LocalDate, LocalDate>>
+        get() = currentWeek.formatNeighborWeek(dateLoadingRange)
+
+    val neighborMonth: Array<YearMonth>
+        get() = currentMonth.formatNeighborMonth(dateLoadingRange)
+
+    init { formatDateCacheByRange(currentMonth, dateLoadingRange) }
 
     fun onIntent(intent: CalendarIntent) {
         when (intent) {
@@ -65,9 +68,10 @@ class CalendarViewModel : ViewModel() {
                             val targetYearMonth = intent.date as YearMonth
                             currentMonth = targetYearMonth
                             currentWeek = targetYearMonth.atDay(1).getWeekRange()
+                            dateLoadingRange = intent.range
                             visibleDates = formatMonthCalendarDate(
                                 yearMonth = targetYearMonth,
-                                range = intent.range.toLong()
+                                range = intent.range
                             )
                         }
                     }
@@ -77,14 +81,15 @@ class CalendarViewModel : ViewModel() {
                             targetHead as LocalDate; targetTail as LocalDate
                             currentMonth = targetTail.getYearMonth()
                             currentWeek = targetHead to targetTail
+                            dateLoadingRange = intent.range
                             visibleDates = formatWeekCalendarDate(
                                 week = targetHead to targetTail,
-                                range = intent.range.toLong()
+                                range = intent.range
                             )
                             if (targetHead.monthValue != targetTail.monthValue)
                                 formatDateCacheByRange(
                                     yearMonth = targetTail.getYearMonth(),
-                                    range = intent.range.toLong(),
+                                    range = intent.range,
                                     scope = this
                                 )
                         }
@@ -94,7 +99,7 @@ class CalendarViewModel : ViewModel() {
             is SelectDate -> selectedDate = intent.date
             ExpandCalendar -> {
                 viewModelScope.launch {
-                    visibleDates = formatMonthCalendarDate(currentMonth)
+                    visibleDates = formatMonthCalendarDate(currentMonth, dateLoadingRange)
                 }
                 expanded = true
             }
@@ -115,14 +120,14 @@ class CalendarViewModel : ViewModel() {
                             }
                         }
                     }
-                    visibleDates = formatWeekCalendarDate(currentWeek)
+                    visibleDates = formatWeekCalendarDate(currentWeek, dateLoadingRange)
                 }
                 expanded = false
             }
         }
     }
 
-    internal fun formatWeekCalendarDate(week: Pair<LocalDate, LocalDate>, range: Long = 1): Array<List<LocalDate>> {
+    internal fun formatWeekCalendarDate(week: Pair<LocalDate, LocalDate>, range: Int = 1): Array<List<LocalDate>> {
         return week.formatNeighborWeek(range).map { (head, tail) ->
             cachedDates[tail.getYearMonth()]?.run {
                 subList(indexOf(head), indexOf(tail) + 1)
@@ -130,7 +135,7 @@ class CalendarViewModel : ViewModel() {
         }.toTypedArray()
     }
 
-    internal fun formatMonthCalendarDate(yearMonth: YearMonth, range: Long = 1): Array<List<LocalDate>> {
+    internal fun formatMonthCalendarDate(yearMonth: YearMonth, range: Int = 1): Array<List<LocalDate>> {
         return yearMonth.formatNeighborMonth(range).map {
             cachedDates[it] ?: run {
                 val table = calculateMonthTable(it)
@@ -141,7 +146,7 @@ class CalendarViewModel : ViewModel() {
     }
 
 
-    internal fun formatDateCacheByRange(yearMonth: YearMonth, range: Long = 1, scope: CoroutineScope = viewModelScope) {
+    internal fun formatDateCacheByRange(yearMonth: YearMonth, range: Int = 1, scope: CoroutineScope = viewModelScope) {
         scope.launch {
             cachedDates[yearMonth] ?: run {
                 cachedDates.put(yearMonth, calculateMonthTable(yearMonth))
@@ -151,8 +156,8 @@ class CalendarViewModel : ViewModel() {
                 launch {
                     val key = YearMonth.of(yearMonth.year, yearMonth.month).run {
                         when {
-                            offset > 0 -> plusMonths(offset)
-                            offset < 0 -> minusMonths(abs(offset))
+                            offset > 0 -> plusMonths(offset.toLong())
+                            offset < 0 -> minusMonths(abs(offset).toLong())
                             else -> null
                         }
                     }

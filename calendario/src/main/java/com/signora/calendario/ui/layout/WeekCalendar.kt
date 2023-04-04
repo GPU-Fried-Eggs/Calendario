@@ -16,7 +16,6 @@ import com.signora.calendario.models.CalendarItemState.Companion.getState
 import com.signora.calendario.models.CalendarPeriod
 import com.signora.calendario.ui.CalendarPager
 import com.signora.calendario.ui.theme.CalendarTheme
-import com.signora.calendario.utils.formatNeighborWeek
 import com.signora.calendario.viewmodels.CalendarViewModel
 import com.signora.calendario.views.CalenderItemView
 import java.time.DayOfWeek
@@ -80,7 +79,7 @@ fun WeekCalendar(
 private fun WeekCalendarPreview(calendarViewModel: CalendarViewModel = viewModel()) {
     WeekCalendar(
         loadedDates = calendarViewModel.visibleDates,
-        loadedMonthWeek = calendarViewModel.currentWeek.formatNeighborWeek().toTypedArray(),
+        loadedMonthWeek = calendarViewModel.neighborWeek,
         loadDatesForMonthWeek = {
             calendarViewModel.onIntent(CalendarIntent.LoadDate(it, period = CalendarPeriod.WEEK))
         },

@@ -23,7 +23,7 @@ class Colors(
         internal set
 
     var selectedItemBackgroundColor by mutableStateOf(selectedItemBackgroundColor, structuralEqualityPolicy())
-        internal set;
+        internal set
 
     var onSelectedItemBackgroundColor by mutableStateOf(onSelectedItemBackgroundColor, structuralEqualityPolicy())
         internal set

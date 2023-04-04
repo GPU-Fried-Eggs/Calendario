@@ -15,6 +15,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.signora.calendario.models.DefaultKanbanTask
 import com.signora.calendario.models.KanbanTask
 import com.signora.calendario.utils.generateRandomColor
 import com.signora.calendario.utils.getOffsetSize
@@ -105,18 +106,12 @@ fun KanbanGridView(
 @Preview
 @Composable
 private fun KanbanGridViewPreview() {
-    data class PreviewKanbanTask(
-        override val range: Pair<LocalDateTime, LocalDateTime>,
-        override val color: Color = Color(0xFFB2EBF2),
-        override val payload: String
-    ) : KanbanTask
-
     KanbanGridView(
         timeScalar = (0..23).map {
             LocalDateTime.of(2023, 1, 1, it, 0, 0)
         },
         taskPlanList = (0..23).map {
-            PreviewKanbanTask(
+            DefaultKanbanTask(
                 Pair(
                     LocalDateTime.of(2023, 1, 1, it, 0, 0),
                     LocalDateTime.of(2023, 1, 1, it, 59, 59)
@@ -126,7 +121,7 @@ private fun KanbanGridViewPreview() {
             )
         },
         taskDoneList = listOf(
-            PreviewKanbanTask(
+            DefaultKanbanTask(
                 Pair(
                     LocalDateTime.of(2023, 1, 1, 8, 30, 20),
                     LocalDateTime.of(2023, 1, 1, 9, 30, 10)

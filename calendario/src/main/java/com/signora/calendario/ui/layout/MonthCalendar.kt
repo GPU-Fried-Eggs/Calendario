@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -17,7 +16,6 @@ import com.signora.calendario.models.CalendarIntent
 import com.signora.calendario.models.CalendarItemState.Companion.getState
 import com.signora.calendario.ui.CalendarPager
 import com.signora.calendario.ui.theme.CalendarTheme
-import com.signora.calendario.utils.formatNeighborMonth
 import com.signora.calendario.viewmodels.CalendarViewModel
 import com.signora.calendario.views.CalenderItemView
 import java.time.DayOfWeek
@@ -91,7 +89,7 @@ private fun MonthCalendarPreview(calendarViewModel: CalendarViewModel = viewMode
 
     MonthCalendar(
         loadedDates = calendarViewModel.visibleDates,
-        loadedYearMonth = calendarViewModel.currentMonth.formatNeighborMonth().toTypedArray(),
+        loadedYearMonth = calendarViewModel.neighborMonth,
         loadDatesForYearMonth = {
             calendarViewModel.onIntent(CalendarIntent.LoadDate(it))
         },
