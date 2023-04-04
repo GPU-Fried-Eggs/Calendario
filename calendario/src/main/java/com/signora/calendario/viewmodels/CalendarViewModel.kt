@@ -78,12 +78,12 @@ class CalendarViewModel : ViewModel() {
                     CalendarPeriod.WEEK -> {
                         viewModelScope.launch {
                             val (targetHead, targetTail) = intent.date as Pair<*, *>
-                            targetHead as LocalDate; targetTail as LocalDate
+                            val targetWeek = targetHead as LocalDate to targetTail as LocalDate
                             currentMonth = targetTail.getYearMonth()
-                            currentWeek = targetHead to targetTail
+                            currentWeek = targetWeek
                             dateLoadingRange = intent.range
                             visibleDates = formatWeekCalendarDate(
-                                week = targetHead to targetTail,
+                                week = targetWeek,
                                 range = intent.range
                             )
                             if (targetHead.monthValue != targetTail.monthValue)
@@ -144,7 +144,6 @@ class CalendarViewModel : ViewModel() {
             }
         }.toTypedArray()
     }
-
 
     internal fun formatDateCacheByRange(yearMonth: YearMonth, range: Int = 1, scope: CoroutineScope = viewModelScope) {
         scope.launch {

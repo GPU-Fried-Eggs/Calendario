@@ -1,6 +1,5 @@
 package com.signora.calendario.views
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -9,8 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +44,8 @@ fun KanbanGridView(
         ) {
             timeScalar.forEach { text ->
                 Text(
-                    text = text.format(DateTimeFormatter.ofPattern("HH:mm"))
+                    text = text.format(DateTimeFormatter.ofPattern("HH:mm")),
+                    maxLines = 1
                 )
             }
         }
@@ -50,27 +53,13 @@ fun KanbanGridView(
             modifier = Modifier
                 .fillMaxSize(),
         ) {
-            Log.d("TaskBoard", "$size, $center")
             // left panel
-            taskPlanList.forEach {
-                val (offset, size) = getOffsetSize(
-                    range = it.range,
-                    parentOffset = Offset.Zero,
-                    parentSize = size.copy(width = size.width / 2f)
-                )
-                drawRoundRect(
-                    color = it.color,
-                    topLeft = offset,
-                    size = size,
-                    cornerRadius = CornerRadius(12f, 12f)
-                )
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = it.payload,
-                    topLeft = offset,
-                    size = size
-                )
-            }
+            drawTaskPanel(
+                tasks = taskPlanList,
+                offset = Offset.Zero,
+                size = size.copy(width = size.width / 2f),
+                textMeasurer = textMeasurer,
+            )
 
             // divide line
             drawLine(
@@ -80,26 +69,41 @@ fun KanbanGridView(
             )
 
             // right panel
-            taskDoneList.forEach {
-                val (offset, size) = getOffsetSize(
-                    range = it.range,
-                    parentOffset = center.copy(y = 0f),
-                    parentSize = size.copy(width = size.width / 2f)
-                )
-                drawRoundRect(
-                    color = it.color,
-                    topLeft = offset,
-                    size = size,
-                    cornerRadius = CornerRadius(12f, 12f)
-                )
-                drawText(
-                    textMeasurer = textMeasurer,
-                    text = it.payload,
-                    topLeft = offset,
-                    size = size
-                )
-            }
+            drawTaskPanel(
+                tasks = taskDoneList,
+                offset = center.copy(y = 0f),
+                size = size.copy(width = size.width / 2f),
+                textMeasurer = textMeasurer,
+            )
         }
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+private fun DrawScope.drawTaskPanel(
+    tasks: List<KanbanTask>,
+    offset: Offset,
+    size: Size,
+    textMeasurer: TextMeasurer
+) {
+    tasks.forEach {
+        val (childOffset, childSize) = getOffsetSize(
+            range = it.range,
+            parentOffset = offset,
+            parentSize = size
+        )
+        drawRoundRect(
+            color = it.color,
+            topLeft = childOffset,
+            size = childSize,
+            cornerRadius = CornerRadius(12f, 12f)
+        )
+        drawText(
+            textMeasurer = textMeasurer,
+            text = it.payload,
+            topLeft = childOffset,
+            size = childSize
+        )
     }
 }
 
