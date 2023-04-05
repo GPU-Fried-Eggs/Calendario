@@ -21,7 +21,7 @@ import com.signora.calendario.ui.theme.CalendarTheme
 import java.time.LocalDate
 
 @Composable
-fun CalenderItemView(
+internal fun CalenderItemView(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = LocalTextStyle.current,
     state: CalendarItemState = Default,

@@ -62,7 +62,7 @@ fun CalendarHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.run { if (expanded) KeyboardArrowUp else KeyboardArrowDown },
-                contentDescription = stringResource(R.string.calendar_toggle_description),
+                contentDescription = stringResource(R.string.calendar_toggle_icon_description),
                 tint = CalendarTheme.colors.onBackgroundColor
             )
         }

@@ -4,10 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -80,7 +77,7 @@ fun Pager(
                     Box(
                         modifier = Modifier
                             .nestedScroll(consumeFlingNestedScrollConnection)
-                            .fillParentMaxHeight()
+                            .fillParentMaxHeight() // require full height
                             .wrapContentSize()
                     ) {
                         pageContent(page)
@@ -103,7 +100,7 @@ fun Pager(
                     Box(
                         modifier = Modifier
                             .nestedScroll(consumeFlingNestedScrollConnection)
-                            .fillParentMaxWidth()
+                            .fillParentMaxWidth() // require full width
                             .wrapContentSize()
                     ) {
                         pageContent(page)

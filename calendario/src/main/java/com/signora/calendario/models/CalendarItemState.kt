@@ -2,12 +2,12 @@ package com.signora.calendario.models
 
 import java.time.LocalDate
 
-sealed class CalendarItemState {
-    object Selected : CalendarItemState()
+sealed interface CalendarItemState {
+    object Selected : CalendarItemState
 
-    object Today : CalendarItemState()
+    object Today : CalendarItemState
 
-    object Default : CalendarItemState()
+    object Default : CalendarItemState
 
     companion object {
         fun getState(current: LocalDate, selectedDate: LocalDate?): CalendarItemState {
