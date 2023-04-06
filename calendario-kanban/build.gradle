@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.signora.calendario'
+    namespace 'com.signora.calendario.kanban'
     compileSdk 33
 
     defaultConfig {

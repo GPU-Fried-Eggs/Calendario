@@ -7,7 +7,9 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainDispatcherRule(private val testDispatcher: TestDispatcher = StandardTestDispatcher()) : TestWatcher() {
+class MainDispatcherRule(
+    private val testDispatcher: TestDispatcher = StandardTestDispatcher()
+) : TestWatcher() {
     override fun starting(description: Description) {
         super.starting(description)
         Dispatchers.setMain(testDispatcher)

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_toggle_icon_description">Toggle calendar view</string>
+
+    <string name="kanban_plan">Plan</string>
+    <string name="kanban_done">Done</string>
+
+    <string name="remove_task_icon_description">Remove task</string>
+    <string name="kanban_grid_icon_description">Grid layout</string>
+    <string name="kanban_list_icon_description">List layout</string>
+</resources>
