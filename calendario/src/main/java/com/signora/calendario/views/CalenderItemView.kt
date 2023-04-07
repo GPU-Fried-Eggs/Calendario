@@ -2,7 +2,18 @@ package com.signora.calendario.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.signora.calendario.models.CalendarItemState
-import com.signora.calendario.models.CalendarItemState.*
+import com.signora.calendario.models.CalendarItemState.Default
+import com.signora.calendario.models.CalendarItemState.Selected
+import com.signora.calendario.models.CalendarItemState.Today
 import com.signora.calendario.ui.theme.CalendarTheme
 import java.time.LocalDate
 
@@ -54,7 +67,7 @@ internal fun CalenderItemView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        headerContent?.let { it() }
+        headerContent?.invoke()
         Box(
             modifier = containerModifier
                 .aspectRatio(1f)
@@ -79,7 +92,7 @@ internal fun CalenderItemView(
                 style = textStyle
             )
         }
-        footerContent?.let { it() }
+        footerContent?.invoke()
     }
 }
 
